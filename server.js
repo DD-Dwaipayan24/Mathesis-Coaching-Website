@@ -299,7 +299,7 @@ app.post("/forgot-password", async (req, res) => {
       service: "gmail",
       auth: {
         user: "mathesis.coaching@gmail.com",
-        pass: "lwartuxmyfweTwyc", // Google App Password
+        pass: process.env.EMAIL_PASSCODE, // Google App Password
       },
     });
 
