@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Page</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .payment-container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); width: 300px; }
+    input, button { width: 100%; padding: 10px; margin: 10px 0; }
+    button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #45a049; }
+  </style>
+  <!-- ✅ IMPORTANT: Include Cashfree SDK -->
+  <script src="https://sdk.cashfree.com/js/ui/2.0.0/cashfree.js"></script>
+</head>
+<body>
+
+<div class="payment-container">
+  <h2>Make a Payment</h2>
+  <form id="paymentForm">
+    <input type="text" id="name" placeholder="Full Name" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="text" id="phone" placeholder="Phone Number" required />
+    <input type="number" id="amount" placeholder="Amount (INR)" required />
+    <button type="submit">Pay Now</button>
+  </form>
+</div>
+
+<script>
+document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const orderData = {
+    orderId: 'ORDER' + Date.now(),
+    orderAmount: document.getElementById('amount').value,
+    customerName: document.getElementById('name').value,
+    customerEmail: document.getElementById('email').value,
+    customerPhone: document.getElementById('phone').value
+  };
+  const res = await fetch('/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+  const data = await res.json();
+  //console.log('Server Response:', data);
+  console.log("Payment Session ID from server:", data.order_id);
+  const cfCheckout = new CashfreeUI({
+      orderToken: data.order_id,
+      environment: 'sandbox',
+      onSuccess: function(resp) {
+        console.log('✅ Payment Success:', resp);
+        window.location.href = '/payment-success';
+      },
+      onFailure: function(resp) {
+        console.log('❌ Payment Failed:', resp);
+        window.location.href = '/payment-failed';
+      }
+    });
+  cfCheckout.open();
+  console.log(window.CashfreeUI);
+
+  // try {
+    // const res = await fetch('/create-order', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(orderData)
+    // });
+
+    // const data = await res.json();
+    //console.log('Server Response:', data);
+
+    // if (data.order_id) {
+    //   const cfCheckout = new CashfreeUI({
+    //     orderToken: data.payment_session_id,
+    //     environment: 'sandbox',
+    //     onSuccess: function(resp) {
+    //       console.log('✅ Payment Success:', resp);
+    //       window.location.href = '/payment-success';
+    //     },
+    //     onFailure: function(resp) {
+    //       console.log('❌ Payment Failed:', resp);
+    //       window.location.href = '/payment-failed';
+    //     }
+    //   });
+    //   cfCheckout.open();
+    // } else {
+    //   alert('Payment initialization failed. Try again.');
+    // }
+
+  // } catch (error) {
+  //   console.error('Error:', error);
+  //   alert('Payment initialization failed. Check console.');
+  // }
+});
+</script>
+</body>
+</html>
