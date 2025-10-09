@@ -21,6 +21,7 @@
     "init": "^0.1.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.3",
+    "mongose": "^0.0.2-security",
     "nodemailer": "^7.0.6",
     "stripe": "^18.5.0"
   }
