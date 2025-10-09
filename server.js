@@ -23,7 +23,9 @@ app.use(express.static(__dirname));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname)));  // Serve static files from root directory
+
+// Serve HTML files
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
