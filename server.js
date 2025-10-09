@@ -18,17 +18,41 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// ✅ Also serve images folder
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+//css folder
+app.use("/css", express.static(path.join(__dirname, "css")));
+app.use("/scss", express.static(path.join(__dirname, "scss")));
+
+//js folder
+app.use("/js", express.static(path.join(__dirname, "js")));
+
+//fonts folder
+app.use("/fonts", express.static(path.join(__dirname, "fonts")));
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname)));  // Serve static files from root directory
+//app.use(express.static(path.join(__dirname)));  // Serve static files from root directory
 
 // Serve HTML files
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "about.html"));
+  res.sendFile(path.join(__dirname, "course.html"));
+  res.sendFile(path.join(__dirname, "course-2.html"));
+  res.sendFile(path.join(__dirname, "registration.html"));
+  res.sendFile(path.join(__dirname, "instructor.html"));
+  res.sendFile(path.join(__dirname, "contact.html"));
+  res.sendFile(path.join(__dirname, "payment.html"));
+  res.sendFile(path.join(__dirname, "reset-password.html"));
+  res.sendFile(path.join(__dirname, "payment_success.html"));
+  res.sendFile(path.join(__dirname, "payment_cancel.html"));
+  res.sendFile(path.join(__dirname, "forgot-password.html"));
+  res.sendFile(path.join(__dirname, "dashboard.html"));
 });
 
 // Session middleware
@@ -42,7 +66,7 @@ app.use(session({
 
 // MongoDB connection
 mongoose.connect(
-  'mongodb+srv://mathesiscoaching_db_user:Z1w2DeczX5xVEpd1@coaching-database.asltr7d.mongodb.net/',
+  process.env.MONGO_URI,
   { useNewUrlParser: true, useUnifiedTopology: true }
 )
 .then(() => console.log('✅ MongoDB connected'))
@@ -181,7 +205,7 @@ app.get("/dashboard", requireLogin, async (req, res) => {
     if (!user.hasPaid) {
       return res.redirect("/payment.html"); // 🚀 redirect to payment page
     }
-    res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+    res.sendFile(path.join(__dirname, "dashboard.html"));
   } catch (err) {
     res.status(500).send("❌ Error loading dashboard");
   }
@@ -189,7 +213,7 @@ app.get("/dashboard", requireLogin, async (req, res) => {
 
 //Admin Dashboard
 app.get('/admin-dashboard', requireAdmin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
 });
 
 // Logout route
