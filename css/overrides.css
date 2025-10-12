@@ -1,0 +1,34 @@
+/* Ensure navbar sits above everything and is fixed to the top of the viewport.
+   Use !important on padding-top so we override any inline page styles that set
+   body padding (the privacy-policy page currently sets padding:40px inline). */
+:root { --ftco-navbar-height: 70px; }
+
+html, body { margin: 0; }
+
+.ftco-navbar-light, .navbar, header.ftco-navbar-light {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 99999 !important; /* very high to beat page content */
+  background-color: rgba(255,255,255,0.94) !important;
+  backdrop-filter: saturate(120%) blur(6px);
+}
+
+/* Force the page content to start below the navbar. Using only padding-top
+   so we don't disturb left/right padding set by pages. Use !important to
+   override inline styles that set body padding (e.g. padding:40px). */
+@media (min-width: 768px) {
+  body { padding-top: var(--ftco-navbar-height) !important; }
+}
+
+@media (max-width: 767.98px) {
+  /* Mobile nav tends to be taller when expanded */
+  body { padding-top: calc(var(--ftco-navbar-height) + 20px) !important; }
+}
+
+/* Small visual tweak: ensure the container inside the fixed navbar centers correctly */
+.ftco-navbar-light .container {
+  max-width: 1110px; /* match theme container */
+}

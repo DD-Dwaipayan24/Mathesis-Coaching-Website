@@ -411,6 +411,16 @@ mark,
   font-size: 90%;
   color: #6c757d; }
 
+.red-strike {
+  text-decoration: line-through;
+  text-decoration-color: red;
+}
+.new-price {
+  /* color: #00ff00; */
+  font-weight: 900;
+  font-size: 26px;
+}
+
 code {
   font-size: 87.5%;
   color: #e83e8c;
@@ -3535,6 +3545,25 @@ input[type="button"].btn-block {
       -o-transition: none;
       transition: none; } }
 
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* space between logo and name */
+}
+
+.site-logo {
+  width: 80px; /* adjust size */
+  height: 60px;
+  /* border-radius: 60%;   makes it a perfect circle */
+  object-fit: cover;    /* crops image nicely inside the circle */
+  /* border: 2px solid #333; */
+}
+.site-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333; /* adjust color */
+}
+
 .nav {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -3554,6 +3583,58 @@ input[type="button"].btn-block {
     color: #6c757d;
     pointer-events: none;
     cursor: default; }
+
+/* Active nav link as a visible block/pill */
+.nav-link.active,
+.navbar-nav .nav-link.active,
+.ftco-navbar-light .navbar-nav > .nav-item.active > .nav-link {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #ce4be8 0%, #207ce5 100%);
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 30px;
+  box-shadow: 0 6px 18px rgba(32,124,229,0.12);
+  transition: .2s all ease;
+}
+.nav-link.active:hover, .nav-link.active:focus {
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* Make nav link text vertically aligned across items */
+/* Desktop: use flex alignment so labels (Home, About, Course...) sit on the same baseline */
+@media (min-width: 768px) {
+  .navbar, .ftco-navbar-light {
+    align-items: center; /* ensure navbar children are centered vertically */
+  }
+
+  .navbar-nav .nav-item,
+  .ftco-navbar-light .navbar-nav > .nav-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-nav .nav-link,
+  .ftco-navbar-light .navbar-nav > .nav-item > .nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 0.9rem; /* normalize vertical spacing */
+    padding-bottom: 0.9rem;
+    line-height: 1; /* keep text vertically centered inside the link */
+  }
+}
+
+/* Mobile fallback: keep original compact padding */
+@media (max-width: 767.98px) {
+  .navbar-nav .nav-link,
+  .ftco-navbar-light .navbar-nav > .nav-item > .nav-link {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    display: block;
+  }
+}
 
 .nav-tabs {
   border-bottom: 1px solid #dee2e6; }
@@ -8610,7 +8691,7 @@ h1, h2, h3, h4, h5,
     background: linear-gradient(45deg, rgba(32, 124, 229, 0) 0%, rgba(146, 95, 206, 0) 55%, #f048bb 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#207ce5', endColorstr='#f048bb', GradientType=1 ); }
   .hero-wrap.hero-wrap-2 {
-    height: 600px;
+    height: 200px;
     position: relative;
     background-size: cover;
     background-repeat: no-repeat;
@@ -9902,6 +9983,38 @@ textarea.form-control {
           color: #fff;
           background: black; }
 
+.video-container {
+  position: relative;
+  width: 120%;
+  /* increased max-width so video window is larger on wide screens */
+  max-width: 1500px; /* previously 700px */
+  margin: auto;
+  border-radius: 20px;
+  overflow: hidden;
+  /* softened shadow and neutral color */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive tweaks: keep full-width on small screens, allow larger container on wide screens */
+@media (max-width: 767.98px) {
+  .video-container {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+}
+@media (min-width: 992px) {
+  .video-container {
+    max-width: 1100px; /* allow even larger on wide desktops */
+  }
+}
+
+video {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
 .search-form .form-group {
   position: relative; }
   .search-form .form-group input {
@@ -10105,3 +10218,43 @@ textarea.form-control {
   100% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -136px; } }
+
+/* === NAV ALIGNMENT OVERRIDES === */
+/* Put these at the end to ensure they override earlier rules */
+.ftco-navbar-light .navbar-nav,
+.navbar-nav {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ftco-navbar-light .navbar-nav > .nav-item,
+.navbar-nav > .nav-item {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ftco-navbar-light .navbar-nav > .nav-item > .nav-link,
+.navbar-nav > .nav-item > .nav-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding-top: 0.9rem !important;
+  padding-bottom: 0.9rem !important;
+  line-height: 1 !important;
+}
+
+/* Ensure the brand doesn't shift nav item baseline */
+.ftco-navbar-light .navbar-brand,
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Small screens keep compact padding */
+@media (max-width: 767.98px) {
+  .ftco-navbar-light .navbar-nav > .nav-item > .nav-link,
+  .navbar-nav > .nav-item > .nav-link {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    display: block !important;
+  }
+}
