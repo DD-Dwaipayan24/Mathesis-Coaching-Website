@@ -33,7 +33,7 @@
 
             <div class="collapse navbar-collapse" id="ftco-nav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
                     <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
                     <li class="nav-item"><a href="course.html" class="nav-link">Course</a></li>
                     <li class="nav-item"><a href="instructor.html" class="nav-link">Instructor</a></li>
@@ -41,45 +41,25 @@
                 </ul>
             </div>
         </div>
-        <!-- Account Menu -->
-        <div class="account-menu">
-            <div class="account-icon">👤</div>
-                <div class="dropdown">
-                    <a href="/index.html">Logout</a>
-                </div>
-        </div>
     </nav>
 <!-- END nav -->
     <meta charset="UTF-8">
     <title>Student Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="./dashboard.css">
 </head>
-<body>
-
-  <main>
+<main>
     <h2>Available Videos</h2>
-    <div id="video-container">
+
+    <div id="video-container" class="video-container">
       <!-- Videos will load here dynamically -->
     </div>
   </main>
-  <button id="checkout-button">Pay Now</button>
-
-  <script src="https://js.stripe.com/v3/"></script>
-  <script>
-    const stripe = Stripe("pk_test_your_publishable_key_here"); // Replace with your public key
-
-    document.getElementById("checkout-button").addEventListener("click", async () => {
-      const res = await fetch("/create-checkout-session", { method: "POST" });
-      const data = await res.json();
-      const result = await stripe.redirectToCheckout({ sessionId: data.id });
-      if (result.error) {
-        alert(result.error.message);
-      }
-    });
-  </script>
 
 
-  <script src="dashboard.js"></script>
+  <script src="./js/dashboard.js"></script>
+<body>
+
+  
 
     <footer class="ftco-footer ftco-no-pt">
   <div class="container">

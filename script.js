@@ -20,7 +20,7 @@ form.addEventListener('submit', async (e) => {
         const text = await response.text();
         if (response.ok) {
             alert("✅ Registration successful!");
-            window.location.href = "/index.html";
+            window.location.href = "/login.html";
         } else {
             alert("❌ " + text);
         }

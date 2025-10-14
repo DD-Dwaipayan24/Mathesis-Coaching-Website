@@ -16,7 +16,7 @@ require("dotenv").config();
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
 
 // ✅ Also serve images folder
 app.use("/images", express.static(path.join(__dirname, "images")));
@@ -53,6 +53,9 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "payment_cancel.html"));
   res.sendFile(path.join(__dirname, "forgot-password.html"));
   res.sendFile(path.join(__dirname, "dashboard.html"));
+  res.sendFile(path.join(__dirname, "login.html"));
+  res.sendFile(path.join(__dirname, "admin-dashboard.html"));
+  res.sendFile(path.join(__dirname, "privacy-policy.html"));
 });
 
 // Session middleware
@@ -81,6 +84,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   role: { type: String, enum: ["student", "admin"], default: "student" },
   hasPaid: { type: Boolean, default: false },
+  purchasedCourses: { type: [String], default: [] }, // Array of course IDs
   resetPasswordToken: String,
   resetPasswordExpires: Date
 });
@@ -147,16 +151,18 @@ app.post('/login', async (req, res) => {
     if (!isMatch) return res.send('❌ Invalid password.');
 
     // ✅ Store role in session
-    req.session.user = { id: user._id, name: user.name, role: user.role };
+    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role };
+    // res.json({ message: 'Login successful', user: { email: user.email } });
 
     // Redirect based on role
-    if (user.role === 'admin') {
-      res.redirect('/admin-dashboard');
-    } else {
-      res.redirect('/dashboard');
-    }
+    res.json({
+      message: 'Login successful',
+      role: user.role,
+      redirectTo: user.role === 'admin' ? '/admin-dashboard' : '/dashboard'
+    });
+
   } catch (err) {
-    res.send('❌ Error: ' + err.message);
+    return res.send('❌ Error: ' + err.message);
   }
 });
 
@@ -196,6 +202,70 @@ function requireAdmin(req, res, next) {
   }
   next();
 }
+
+// --- Check Course Access ---
+app.get('/check-access/:courseId', async (req, res) => {
+  try {
+    const userSession = req.session.user;
+  if (!userSession){
+    console.log('❌ No session found');
+    return res.status(403).json({ hasPaid: false, message: 'Not logged in' });
+  }
+  console.log('🧠 Current session data:', req.session.user);
+
+  const user = await User.findOne({ email: userSession.email });
+  if (!user) {
+    console.log('❌ User not found');
+    return res.status(403).json({ hasPaid: false, message: 'User not found' });
+  }
+
+  const courseId = decodeURIComponent(req.params.courseId); // e.g., "PDE" or "Complex Analysis"
+  console.log('🎓 Checking access for:', courseId);
+  console.log('👤 User purchased courses:', user.purchasedCourses);
+
+   // Check if this course is in the purchasedCourses array
+  const hasPaid = user.hasPaid && user.purchasedCourses.includes(courseId);
+  console.log('💰 Access result:', hasPaid);
+
+  return res.json({ hasPaid });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ hasPaid: false, message: 'Server error' });
+  }
+});
+
+// --- Request Access ---
+app.post('/request-access/:courseId', async (req, res) => {
+  // In production, admin will approve manually
+  res.json({ message: `Request for ${req.params.courseId} sent to admin.` });
+});
+
+// --- Admin Unlock Course ---
+app.post('/admin/unlock-course', async (req, res) => {
+  const { email, courseId } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  if (!user.purchasedCourses.includes(courseId)) {
+    user.purchasedCourses.push(courseId);
+    await user.save();
+  }
+  res.json({ message: `Course ${courseId} unlocked for ${email}` });
+});
+
+
+// --- Add Purchased Course (simulate payment success) ---
+app.post('/add-course', async (req, res) => {
+  const { email, courseId } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  if (!user.purchasedCourses.includes(courseId)) {
+    user.purchasedCourses.push(courseId);
+    await user.save();
+  }
+  res.json({ message: 'Course added successfully' });
+});
 
 // Dashboard route
 //Student Dashboard

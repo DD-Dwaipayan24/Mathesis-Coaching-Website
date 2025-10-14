@@ -63,26 +63,59 @@
             <div class="col-md-5 order-md-last">
             <div class="login-wrap p-4 p-md-5">
                 <h3 class="mb-4">Log In</h3>
-                <form id="loginForm" method="POST" action="/login">
+                <form id="loginForm">
                     <div class="form-group">
                         <label class="label" for="email">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
                     </div>
                     <div class="form-group">
                         <label class="label" for="password">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Login</button>
                 </form>
-                <script src="/script.js"></script>
+                <!-- <script src="server.js"></script> -->
         <p>Don't have an account? <a href="registration.html">Register here</a></p>
         <p>Forgot your password? <a href="reset-password.html">Reset Password</a></p>
         </div>
         </div>
     </div>
+    <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault(); // stop page reload
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message");
+
+    //   const email = form.email.value;
+    //   const password = form.password.value;
+
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          // Redirect user after successful login
+          window.location.href = data.redirectTo;
+        } else {
+          message.textContent = data.error || "Login failed. Try again.";
+        }
+      } catch (err) {
+        console.error(err);
+        message.textContent = "Server error. Please try again later.";
+      }
+    });
+  </script>
+
 </div>
     <p id="message"></p>
-</section>
+    </section>
     <footer class="ftco-footer ftco-no-pt">
   <div class="container">
     <div class="row mb-5">
