@@ -1,3 +1,4 @@
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -10,6 +11,8 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const axios = require('axios');
+const MongoStore = require('connect-mongo');
+const cors = require("cors");
 
 require("dotenv").config();
 
@@ -17,6 +20,18 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
+
+app.set('trust proxy', 1); // ✅ Required for secure cookies on Vercel/HTTPS
+
+app.use(
+  cors({
+    origin: [
+      "https://www.mathesis-coaching.com/dashboard", // 👈 Replace with your real frontend domain
+      "http://localhost:3000",
+    ],
+    credentials: true,
+  })
+);
 
 // ✅ Also serve images folder
 app.use("/images", express.static(path.join(__dirname, "images")));
@@ -58,11 +73,23 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "privacy-policy.html"));
 });
 
+
+
 // Session middleware
 app.use(session({
   secret: 'mySecretKey123', // change this to a secure key
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  tore: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI, // ⚙️ your MongoDB connection string
+      collectionName: 'sessions', // optional
+    }),
+   cookie: {
+      secure: true, // ✅ required on Vercel (HTTPS)
+      sameSite: "none", // ✅ allow cross-site cookies (important)
+      httpOnly: true, // ✅ helps prevent XSS attacks
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
 }));
 
 // -----------Database Setup-----------
@@ -233,6 +260,51 @@ app.get('/check-access/:courseId', async (req, res) => {
     res.status(500).json({ hasPaid: false, message: 'Server error' });
   }
 });
+
+app.get('/my-courses', async (req, res) => {
+  try {
+    const userSession = req.session.user;
+    if (!userSession) {
+      console.log('❌ No session found');
+      return res.status(403).json({ success: false, message: 'Not logged in' });
+    }
+
+    const user = await User.findOne({ _id: userSession.id });
+    if (!user) {
+      console.log('❌ User not found');
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Check payment status
+    if (!user.hasPaid) {
+      console.log('💰 User has not paid');
+      return res.status(403).json({ success: false, message: 'Payment required' });
+    }
+
+    // 🔗 All courses available on Vimeo
+    const allCourses = [
+      { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 1', vimeoId: '1126890140' },
+      { id: 'Linear Algebra', title: 'Linear Algebra', vimeoId: '1130023147' },
+      { id: 'Real Analysis', title: 'Real Analysis', vimeoId: '1130128992' }
+    ];
+
+    // 🎓 Return only purchased courses
+    const purchasedCourses = allCourses.filter(course =>
+      user.purchasedCourses.includes(course.id)
+    );
+
+    if (purchasedCourses.length === 0) {
+      return res.json({ success: false, message: 'No purchased courses found' });
+    }
+
+    res.json({ success: true, courses: purchasedCourses });
+
+  } catch (err) {
+    console.error('🔥 Error fetching user courses:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 
 // --- Request Access ---
 app.post('/request-access/:courseId', async (req, res) => {

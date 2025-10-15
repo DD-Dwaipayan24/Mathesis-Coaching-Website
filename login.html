@@ -95,6 +95,7 @@
         const res = await fetch("/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: 'include', // ✅ sends cookies/session ID
           body: JSON.stringify({ email, password })
         });
 
