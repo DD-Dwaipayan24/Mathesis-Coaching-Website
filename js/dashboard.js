@@ -5,8 +5,8 @@
 //   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 3', vimeoId: '1126894648' },
 //   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 4', vimeoId: '1126899169' }
 // ];
-const fetch = require('node-fetch');
-console.log(window.location.hostname);
+// const fetch = require('node-fetch');
+// console.log(window.location.hostname);
 // Load all courses and their videos
 async function loadCourses() {
   const container = document.getElementById('video-container');
@@ -25,7 +25,7 @@ async function loadCourses() {
     const courseRes = await fetch(`${API_URL}/my-courses`, { credentials: 'include' });
     if (!courseRes.ok) throw new Error(`my-courses failed: ${courseRes.status}`);
     const courseData = await courseRes.json();
-    console.log('📚 Purchased courses:', courseData);
+    // console.log('📚 Purchased courses:', courseData.courses[0]);
 
     if (!courseData.success || !courseData.courses.length) {
       container.innerHTML = '<p>No purchased courses found.</p>';
@@ -33,43 +33,47 @@ async function loadCourses() {
     }
 
     container.innerHTML = ''; // clear loading message
-
+    
     // 2️⃣ Loop through purchased courses
     for (const course of courseData.courses) {
       const courseDiv = document.createElement('div');
       courseDiv.className = 'course-section';
       courseDiv.innerHTML = `<h2>${escapeHtml(course.title)}</h2>`;
       container.appendChild(courseDiv);
-      console.log(`🎓 Loading course: ${course.id}`);
-
+      
       try {
         // 3️⃣ Check access for this course
-        const accessRes = await fetch(`${API_URL}/check-access/${encodeURIComponent(course.id)}`, { credentials: 'include' });
+        const accessRes = await fetch(`${API_URL}/check-access/${encodeURIComponent(course.courseId)}`, { credentials: 'include' });
         const accessData = await accessRes.json();
-        console.log(`🔑 Access for ${course.id}:`, accessData);
-
-        accessData.hasPaid = true; // TEMPORARY BYPASS FOR TESTING
+        
+        // accessData.hasPaid = true; // TEMPORARY BYPASS FOR TESTING
         if (!accessData.hasPaid) {
           courseDiv.innerHTML += `<p class="locked">🔒 Locked — Please complete payment.</p>`;
           continue;
         }
 
         // 4️⃣ Fetch Vimeo videos for this course (folder)
-        const videoRes = await fetch(`${API_URL}/vimeo-videos/${encodeURIComponent(course.vimeoFolderId)}`, { credentials: 'include' });
+        const videoRes = await fetch(`${API_URL}/vimeo-videos/${encodeURIComponent(course.folderId)}`, { credentials: 'include' });
         if (!videoRes.ok) throw new Error('Failed to load videos');
         const videos = await videoRes.json();
-
-        if (!videos.length) {
+        
+        if (!videos) {
           courseDiv.innerHTML += `<p>No videos available yet.</p>`;
           continue;
         }
 
         // 5️⃣ Render each video securely
         const videoGrid = document.createElement('div');
+        if (!videoGrid) {
+          courseDiv.innerHTML += `<p>Failed to create video grid element.</p>`;
+          // console.warn('⚠️ Failed to create video grid element.');
+          continue;
+        }
         videoGrid.className = 'video-grid';
-
-        videos.forEach(video => {
-          const embedUrl = `https://player.vimeo.com/video/${encodeURIComponent(video.vimeoId)}?h=secure&autopause=0`;
+      
+        videos.videos.forEach(video => {
+          const embedUrl = video.embedUrl;
+          console.log('▶️ Embedding video URL:', embedUrl);
 
           const videoCard = document.createElement('div');
           videoCard.className = 'video-card';
@@ -86,6 +90,10 @@ async function loadCourses() {
           `;
           videoGrid.appendChild(videoCard);
         });
+        if (!videos.videos.length) {
+          courseDiv.innerHTML += `<p>No videos available yet always.</p>`;
+          continue;
+        }
 
         courseDiv.appendChild(videoGrid);
 

@@ -13,7 +13,7 @@ const crypto = require("crypto");
 const axios = require('axios');
 const MongoStore = require('connect-mongo');
 const cors = require("cors");
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 const Course = require('./js/Course');
 
 require("dotenv").config();
@@ -239,6 +239,7 @@ function requireLogin(req, res, next) {
 
 // --- Check Course Access ---
 app.get('/check-access/:courseId', async (req, res) => {
+  // console.log(window.location.hostname);
   try {
     const userSession = req.session.user;
     
@@ -319,26 +320,27 @@ app.get('/my-courses', async (req, res) => {
 app.get('/vimeo-videos/:folderId', async (req, res) => {
   try {
     const folderId = req.params.folderId; // e.g., folder for "Linear Algebra"
-
+    console.log('🎬 Fetching videos for folder ID:', folderId);
     // Fetch videos from that Vimeo folder
-    const vimeoRes = await fetch(`https://api.vimeo.com/users/YOUR_USER_ID/projects/${folderId}/videos`, {
+    const vimeoRes = await fetch(`https://api.vimeo.com/albums/11928597/videos`, {
       headers: {
         Authorization: `Bearer ${process.env.VIMEO_ACCESS_TOKEN}`,
       },
     });
+    // console.log('🎥 Fetching Vimeo videos from folder:', vimeoRes.status);
 
     const data = await vimeoRes.json();
+    // console.log('🎞️ Vimeo API response:', data);
     if (!vimeoRes.ok) {
       return res.status(vimeoRes.status).json({ success: false, message: data.error });
     }
-
     // Extract minimal info for frontend
     const videos = data.data.map(v => ({
       id: v.uri.split('/').pop(),
       title: v.name,
-      embedUrl: `https://player.vimeo.com/video/${v.uri.split('/').pop()}`
+      embedUrl: `https://player.vimeo.com/video/${v.uri.split('/').pop()}?fl=pl&fe=sh`
     }));
-
+    console.log('🎬 Processed video list:', videos.length);
     res.json({ success: true, videos });
   } catch (err) {
     console.error('Error fetching Vimeo videos:', err);
