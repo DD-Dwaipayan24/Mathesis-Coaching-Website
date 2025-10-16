@@ -179,7 +179,7 @@ app.post('/login', async (req, res) => {
     if (!isMatch) return res.send('❌ Invalid password.');
 
     // ✅ Store role in session
-    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role, purchasedCourses: user.purchasedCourses };
+    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role, purchasedCourses: user.purchasedCourses, hasPaid: user.hasPaid };
     // res.json({ message: 'Login successful', user: { email: user.email } });
 
     req.session.save(err => {
@@ -253,14 +253,14 @@ app.get('/check-access/:courseId', async (req, res) => {
     console.log('❌ User not found');
     return res.status(403).json({ hasPaid: false, message: 'User not found' });
   }
-
+  // console.log('👤 User data:', req.params);
   const courseId = decodeURIComponent(req.params.courseId); // e.g., "PDE" or "Complex Analysis"
-  console.log('🎓 Checking access for:', courseId);
-  console.log('👤 User purchased courses:', user.purchasedCourses);
+  //console.log('🎓 Checking access for:', courseId);
+  //console.log('👤 User purchased courses:', user.purchasedCourses);
 
    // Check if this course is in the purchasedCourses array
-  const hasPaid = user.hasPaid && user.purchasedCourses.includes(courseId);
-  console.log('💰 Access result:', hasPaid);
+  const hasPaid = user.hasPaid && user.purchasedCourses[0].includes(courseId);
+  //console.log('💰 Access result:', hasPaid);
 
   return res.json({ hasPaid });
   } catch (err) {
@@ -293,7 +293,7 @@ app.get('/my-courses', async (req, res) => {
 
     // 🎓 Fetch all courses from DB
     const allCourses = await Course.find();
-    console.log('📚 All available courses:', allCourses);
+    //console.log('📚 All available courses:', allCourses);
 
     // console.log('🧠 Current session data:', req.session.userSession);
 
@@ -301,7 +301,7 @@ app.get('/my-courses', async (req, res) => {
     const purchasedCourses = allCourses.filter(course =>
       user.purchasedCourses[0]
     );
-    console.log('✅ Purchased courses:', purchasedCourses);
+    //console.log('✅ Purchased courses:', purchasedCourses);
 
     if (purchasedCourses.length === 0) {
       return res.json({ success: false, message: 'No purchased courses found' });

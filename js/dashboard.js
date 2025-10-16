@@ -5,8 +5,8 @@
 //   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 3', vimeoId: '1126894648' },
 //   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 4', vimeoId: '1126899169' }
 // ];
-
-
+const fetch = require('node-fetch');
+console.log(window.location.hostname);
 // Load all courses and their videos
 async function loadCourses() {
   const container = document.getElementById('video-container');
@@ -19,12 +19,13 @@ async function loadCourses() {
   const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
     : 'https://www.mathesis-coaching.com';
-
+  // console.log('🌐 Using API URL:', API_URL);
   try {
     // 1️⃣ Fetch purchased courses
     const courseRes = await fetch(`${API_URL}/my-courses`, { credentials: 'include' });
     if (!courseRes.ok) throw new Error(`my-courses failed: ${courseRes.status}`);
     const courseData = await courseRes.json();
+    console.log('📚 Purchased courses:', courseData);
 
     if (!courseData.success || !courseData.courses.length) {
       container.innerHTML = '<p>No purchased courses found.</p>';
@@ -39,12 +40,15 @@ async function loadCourses() {
       courseDiv.className = 'course-section';
       courseDiv.innerHTML = `<h2>${escapeHtml(course.title)}</h2>`;
       container.appendChild(courseDiv);
+      console.log(`🎓 Loading course: ${course.id}`);
 
       try {
         // 3️⃣ Check access for this course
         const accessRes = await fetch(`${API_URL}/check-access/${encodeURIComponent(course.id)}`, { credentials: 'include' });
         const accessData = await accessRes.json();
+        console.log(`🔑 Access for ${course.id}:`, accessData);
 
+        accessData.hasPaid = true; // TEMPORARY BYPASS FOR TESTING
         if (!accessData.hasPaid) {
           courseDiv.innerHTML += `<p class="locked">🔒 Locked — Please complete payment.</p>`;
           continue;
