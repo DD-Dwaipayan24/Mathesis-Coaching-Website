@@ -256,13 +256,10 @@ app.get('/check-access/:courseId', async (req, res) => {
   }
   // console.log('👤 User data:', req.params);
   const courseId = decodeURIComponent(req.params.courseId); // e.g., "PDE" or "Complex Analysis"
-  //console.log('🎓 Checking access for:', courseId);
-  //console.log('👤 User purchased courses:', user.purchasedCourses);
-
+  
    // Check if this course is in the purchasedCourses array
   const hasPaid = user.hasPaid && user.purchasedCourses[0].includes(courseId);
-  //console.log('💰 Access result:', hasPaid);
-
+  
   return res.json({ hasPaid });
   } catch (err) {
     console.error(err);

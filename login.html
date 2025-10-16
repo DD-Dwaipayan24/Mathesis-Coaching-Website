@@ -72,7 +72,13 @@
                         <label class="label" for="password">Password</label>
                         <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <div class="form-group ">
+                      <input type="checkbox" class="label" id="agreeCheckbox" required>
+                      <label class="label" for="agreeCheckbox">
+                        I agree to the <a href="privacy-policy.html" target="_blank">Terms & Conditions</a>
+                      </label>
+                    </div>
+                    <button type="submit" id="loginButton" class="btn btn-primary" disabled>Login</button>
                 </form>
                 <!-- <script src="server.js"></script> -->
         <p>Don't have an account? <a href="registration.html">Register here</a></p>
@@ -80,6 +86,23 @@
         </div>
         </div>
     </div>
+    <script>
+      // ✅ Disable login button until "Agree" is checked
+      const checkbox = document.getElementById('agreeCheckbox');
+      const loginButton = document.getElementById('loginButton');
+
+      checkbox.addEventListener('change', () => {
+        loginButton.disabled = !checkbox.checked;
+      });
+
+      // ✅ Optional: Prevent form submission if not agreed
+      document.getElementById('loginForm').addEventListener('submit', function (e) {
+        if (!checkbox.checked) {
+          e.preventDefault();
+          alert('Please agree to the Terms & Conditions before continuing.');
+        }
+      });
+    </script>
     <script>
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault(); // stop page reload
@@ -116,8 +139,8 @@
 
 </div>
     <p id="message"></p>
-    </section>
-    <footer class="ftco-footer ftco-no-pt">
+</section>
+<footer class="ftco-footer ftco-no-pt">
   <div class="container">
     <div class="row mb-5">
       <div class="col-md pt-5">

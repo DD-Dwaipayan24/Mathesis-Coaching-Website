@@ -90,6 +90,31 @@ address {
   font-style: normal;
   line-height: inherit; }
 
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #4CAF50;
+  padding: 15px 30px;
+  color: white;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+header a.logout {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+header a.logout:hover {
+  text-decoration: underline;
+}
+
 ol,
 ul,
 dl {
@@ -9198,6 +9223,61 @@ textarea.form-control {
       font-size: 50px; }
   .video-image h4 {
     font-size: 18px; }
+
+.video-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.video-container-home {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.video-container-home video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+.videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Video Card */
+.video-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  text-align: center;
+}
+.video-card h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+
+/* Video iframe */
+.video-card iframe {
+  width: 100%;
+  height: 250px; /* You can increase to 350 or 400 for larger video */
+  border-radius: 8px;
+  border: none;
+}
+
+.locked {
+  color: #ff0000;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
 
 .staff {
   overflow: hidden;
