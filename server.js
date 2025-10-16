@@ -13,6 +13,8 @@ const crypto = require("crypto");
 const axios = require('axios');
 const MongoStore = require('connect-mongo');
 const cors = require("cors");
+const fetch = require('node-fetch');
+const Course = require('./js/Course');
 
 require("dotenv").config();
 
@@ -80,24 +82,23 @@ app.use(session({
   secret: 'mySecretKey123', // change this to a secure key
   resave: false,
   saveUninitialized: false,
-  tore: MongoStore.create({
+  store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI, // ⚙️ your MongoDB connection string
       collectionName: 'sessions', // optional
     }),
-   cookie: {
-      secure: true, // ✅ required on Vercel (HTTPS)
-      sameSite: "none", // ✅ allow cross-site cookies (important)
-      httpOnly: true, // ✅ helps prevent XSS attacks
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-    },
+  //  cookie: {
+  //     secure: true, // ✅ required on Vercel (HTTPS)
+  //     sameSite: "none", // ✅ allow cross-site cookies (important)
+  //     httpOnly: true, // ✅ helps prevent XSS attacks
+  //     maxAge: 1000 * 60 * 60 * 24, // 1 day
+  //   },
 }));
 
 // -----------Database Setup-----------
 
 // MongoDB connection
 mongoose.connect(
-  process.env.MONGO_URI,
-  { useNewUrlParser: true, useUnifiedTopology: true }
+  process.env.MONGO_URI
 )
 .then(() => console.log('✅ MongoDB connected'))
 .catch(err => console.error('❌ MongoDB connection error:', err));
@@ -178,8 +179,11 @@ app.post('/login', async (req, res) => {
     if (!isMatch) return res.send('❌ Invalid password.');
 
     // ✅ Store role in session
-    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role };
+    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role, purchasedCourses: user.purchasedCourses };
     // res.json({ message: 'Login successful', user: { email: user.email } });
+
+    req.session.save(err => {
+     if (err) return res.status(500).json({ success: false });
 
     // Redirect based on role
     res.json({
@@ -187,58 +191,62 @@ app.post('/login', async (req, res) => {
       role: user.role,
       redirectTo: user.role === 'admin' ? '/admin-dashboard' : '/dashboard'
     });
+    });
 
   } catch (err) {
-    return res.send('❌ Error: ' + err.message);
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // Videos route (Admin Only)
-app.post('/add-video', requireAdmin, async (req, res) => {
-  try {
-    const { title, url } = req.body;
-    const newVideo = new Video({ title, url });
-    await newVideo.save();
-    res.send("✅ Video added successfully! <a href='/admin-dashboard'>Back</a>");
-  } catch (err) {
-    res.send("❌ Error: " + err.message);
-  }
-});
+// app.post('/add-video', requireAdmin, async (req, res) => {
+//   try {
+//     const { title, url } = req.body;
+//     const newVideo = new Video({ title, url });
+//     await newVideo.save();
+//     res.send("✅ Video added successfully! <a href='/admin-dashboard'>Back</a>");
+//   } catch (err) {
+//     res.send("❌ Error: " + err.message);
+//   }
+// });
 
 // Fetch Videos (Students)
-app.get("/videos", requireLogin, async (req, res) => {
-  try {
-    const videos = await Video.find({});
-    res.json(videos);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch videos" });
-  }
-});
+// app.get("/videos", requireLogin, async (req, res) => {
+//   try {
+//     const videos = await Video.find({});
+//     res.json(videos);
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to fetch videos" });
+//   }
+// });
 
 // Middleware to protect routes
 function requireLogin(req, res, next) {
   if (!req.session.user) {
-    return res.redirect('/login.html');
+    console.log('Session data:', req.session);
+    return res.redirect('/index.html');
   }
   next();
 }
 
-function requireAdmin(req, res, next) {
-  if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.status(403).send('❌ Access Denied: Admins only');
-  }
-  next();
-}
+// function requireAdmin(req, res, next) {
+//   if (!req.session.user || req.session.user.role !== 'admin') {
+//     return res.status(403).send('❌ Access Denied: Admins only');
+//   }
+//   next();
+// }
 
 // --- Check Course Access ---
 app.get('/check-access/:courseId', async (req, res) => {
   try {
     const userSession = req.session.user;
+    
   if (!userSession){
     console.log('❌ No session found');
     return res.status(403).json({ hasPaid: false, message: 'Not logged in' });
   }
-  console.log('🧠 Current session data:', req.session.user);
+  //console.log('🧠 Current session data:', req.session.user);
 
   const user = await User.findOne({ email: userSession.email });
   if (!user) {
@@ -264,12 +272,14 @@ app.get('/check-access/:courseId', async (req, res) => {
 app.get('/my-courses', async (req, res) => {
   try {
     const userSession = req.session.user;
+    //This portion checked
     if (!userSession) {
       console.log('❌ No session found');
       return res.status(403).json({ success: false, message: 'Not logged in' });
     }
 
     const user = await User.findOne({ _id: userSession.id });
+    // console.log('👤 User purchased courses:', user.purchasedCourses);
     if (!user) {
       console.log('❌ User not found');
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -281,17 +291,17 @@ app.get('/my-courses', async (req, res) => {
       return res.status(403).json({ success: false, message: 'Payment required' });
     }
 
-    // 🔗 All courses available on Vimeo
-    const allCourses = [
-      { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 1', vimeoId: '1126890140' },
-      { id: 'Linear Algebra', title: 'Linear Algebra', vimeoId: '1130023147' },
-      { id: 'Real Analysis', title: 'Real Analysis', vimeoId: '1130128992' }
-    ];
+    // 🎓 Fetch all courses from DB
+    const allCourses = await Course.find();
+    console.log('📚 All available courses:', allCourses);
+
+    // console.log('🧠 Current session data:', req.session.userSession);
 
     // 🎓 Return only purchased courses
     const purchasedCourses = allCourses.filter(course =>
-      user.purchasedCourses.includes(course.id)
+      user.purchasedCourses[0]
     );
+    console.log('✅ Purchased courses:', purchasedCourses);
 
     if (purchasedCourses.length === 0) {
       return res.json({ success: false, message: 'No purchased courses found' });
@@ -306,24 +316,56 @@ app.get('/my-courses', async (req, res) => {
 });
 
 
-// --- Request Access ---
-app.post('/request-access/:courseId', async (req, res) => {
-  // In production, admin will approve manually
-  res.json({ message: `Request for ${req.params.courseId} sent to admin.` });
-});
+app.get('/vimeo-videos/:folderId', async (req, res) => {
+  try {
+    const folderId = req.params.folderId; // e.g., folder for "Linear Algebra"
 
-// --- Admin Unlock Course ---
-app.post('/admin/unlock-course', async (req, res) => {
-  const { email, courseId } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ message: 'User not found' });
+    // Fetch videos from that Vimeo folder
+    const vimeoRes = await fetch(`https://api.vimeo.com/users/YOUR_USER_ID/projects/${folderId}/videos`, {
+      headers: {
+        Authorization: `Bearer ${process.env.VIMEO_ACCESS_TOKEN}`,
+      },
+    });
 
-  if (!user.purchasedCourses.includes(courseId)) {
-    user.purchasedCourses.push(courseId);
-    await user.save();
+    const data = await vimeoRes.json();
+    if (!vimeoRes.ok) {
+      return res.status(vimeoRes.status).json({ success: false, message: data.error });
+    }
+
+    // Extract minimal info for frontend
+    const videos = data.data.map(v => ({
+      id: v.uri.split('/').pop(),
+      title: v.name,
+      embedUrl: `https://player.vimeo.com/video/${v.uri.split('/').pop()}`
+    }));
+
+    res.json({ success: true, videos });
+  } catch (err) {
+    console.error('Error fetching Vimeo videos:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
-  res.json({ message: `Course ${courseId} unlocked for ${email}` });
 });
+
+
+
+// --- Request Access ---
+// app.post('/request-access/:courseId', async (req, res) => {
+//   // In production, admin will approve manually
+//   res.json({ message: `Request for ${req.params.courseId} sent to admin.` });
+// });
+
+// // --- Admin Unlock Course ---
+// app.post('/admin/unlock-course', async (req, res) => {
+//   const { email, courseId } = req.body;
+//   const user = await User.findOne({ email });
+//   if (!user) return res.status(404).json({ message: 'User not found' });
+
+//   if (!user.purchasedCourses.includes(courseId)) {
+//     user.purchasedCourses.push(courseId);
+//     await user.save();
+//   }
+//   res.json({ message: `Course ${courseId} unlocked for ${email}` });
+// });
 
 
 // --- Add Purchased Course (simulate payment success) ---
@@ -345,7 +387,7 @@ app.get("/dashboard", requireLogin, async (req, res) => {
   try {
     const user = await User.findById(req.session.user.id);
     if (!user.hasPaid) {
-      return res.redirect("/payment.html"); // 🚀 redirect to payment page
+      return res.redirect("/course.html"); // 🚀 redirect to payment page
     }
     res.sendFile(path.join(__dirname, "dashboard.html"));
   } catch (err) {
@@ -354,17 +396,17 @@ app.get("/dashboard", requireLogin, async (req, res) => {
 });
 
 //Admin Dashboard
-app.get('/admin-dashboard', requireAdmin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
-});
+// app.get('/admin-dashboard', requireAdmin, (req, res) => {
+//   res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+// });
 
-// Logout route
-app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.send('Error logging out');
-    res.redirect('/login.html');
-  });
-});
+// // Logout route
+// app.get('/logout', (req, res) => {
+//   req.session.destroy(err => {
+//     if (err) return res.send('Error logging out');
+//     res.redirect('/login.html');
+//   });
+// });
 
 //Payment Route
 app.post('/create-order', async (req, res) => {
