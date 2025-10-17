@@ -113,13 +113,21 @@
 
     //   const email = form.email.value;
     //   const password = form.password.value;
-
+      function getDeviceId() {
+        let deviceId = localStorage.getItem("deviceId");
+        if (!deviceId) {
+          deviceId = crypto.randomUUID();
+          localStorage.setItem("deviceId", deviceId);
+        }
+        return deviceId;
+    }
       try {
+        const deviceId = getDeviceId();
         const res = await fetch("/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: 'include', // ✅ sends cookies/session ID
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ email, password, deviceId })
         });
 
         const data = await res.json();

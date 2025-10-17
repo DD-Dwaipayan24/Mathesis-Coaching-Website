@@ -114,7 +114,8 @@ const userSchema = new mongoose.Schema({
   hasPaid: { type: Boolean, default: false },
   purchasedCourses: { type: [String], default: [] }, // Array of course IDs
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  deviceId: { type: String, default: null }, // store device identifier
 });
 
 // // Hash password before saving
@@ -179,11 +180,25 @@ app.post('/login', async (req, res) => {
     if (!isMatch) return res.send('❌ Invalid password.');
 
     // ✅ Store role in session
-    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role, purchasedCourses: user.purchasedCourses, hasPaid: user.hasPaid };
+    req.session.user = { id: user._id, name: user.name, email: user.email, role: user.role, purchasedCourses: user.purchasedCourses, hasPaid: user.hasPaid, deviceId: user.deviceId };
     // res.json({ message: 'Login successful', user: { email: user.email } });
+    const deviceId = req.body.deviceId;
 
-    req.session.save(err => {
+    req.session.save(async err => {
      if (err) return res.status(500).json({ success: false });
+    
+    // Check device restriction
+    if (user.deviceId && user.deviceId !== deviceId) {
+      return res.json({
+        message: 'Login restricted. You are already logged in from another device. Please email support to reset your device.',
+      });
+    }
+
+    // Save the device if it's the first login
+    if (!user.deviceId) {
+      user.deviceId = deviceId;
+      await user.save();
+    }
 
     // Redirect based on role
     res.json({
