@@ -9242,7 +9242,7 @@ textarea.form-control {
 }
 
 /* Small devices */
-@media (max-width: 768px) {
+@media (max-width: 850px) {
   .video-container {
     grid-template-columns: 1fr;
     gap: 15px;
