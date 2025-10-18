@@ -9231,6 +9231,25 @@ textarea.form-control {
   padding: 20px;
 }
 
+/* Optional: make videos responsive inside */
+.video-container iframe,
+.video-container video {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* Small devices */
+@media (max-width: 768px) {
+  .video-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 15px;
+  }
+}
+
 .video-container-home {
   position: relative;
   width: 100%;

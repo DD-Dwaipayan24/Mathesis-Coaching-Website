@@ -61,15 +61,12 @@
     </div>
 
 
-<section class="ftco-section ftco-no-pb ftco-no-pt">
+<!-- <section class="ftco-section ftco-no-pb ftco-no-pt">
   <div class="container">
     <div class="row">
-      <!-- Left side (empty space or content) -->
       <div class="col-lg-7 col-md-6 d-none d-md-block">
-        <!-- optional space -->
       </div>
 
-      <!-- Right side (video section) -->
       <div class="col-lg-5 col-md-6 col-12">
         <div class="login-wrap p-4 p-md-5">
           <div class="video-container-home">
@@ -83,6 +80,60 @@
     </div>
   </div>
   <p id="message"></p>
+</section> -->
+
+<section class="ftco-section ftco-no-pb ftco-no-pt">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7"></div>
+            <div class="col-md-5 order-md-last">
+            <div class="login-wrap p-4 p-md-5">
+                <h3 class="mb-4">Register</h3>
+                <form id="registrationForm" method="POST" action="/register">
+                    <div class="form-group">
+                        <label class="label" for="name">Full Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="email">Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="password">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <div class="form-group ">
+                        <input type="checkbox" class="label" id="agreeCheckbox" required>
+                        <label class="label" for="agreeCheckbox">
+                            I agree to the <a href="privacy-policy.html" target="_blank">Terms & Conditions</a>
+                        </label>
+                    </div>
+                    <button type="submit" id="loginButton" class="btn btn-primary" disabled>Register</button>
+                </form>
+                <script src="/script.js"></script>
+        <p>Already have an account? <a href="login.html">Login here</a></p>
+        </div>
+        </div>
+    </div>
+    <script>
+        // ✅ Disable login button until "Agree" is checked
+        const checkbox = document.getElementById('agreeCheckbox');
+        const loginButton = document.getElementById('loginButton');
+
+        checkbox.addEventListener('change', () => {
+            loginButton.disabled = !checkbox.checked;
+        });
+
+        // ✅ Optional: Prevent form submission if not agreed
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            if (!checkbox.checked) {
+            e.preventDefault();
+            alert('Please agree to the Terms & Conditions before continuing.');
+            }
+        });
+    </script>
+</div>
+    <p id="message"></p>
 </section>
 
 
@@ -111,10 +162,22 @@
                 <p class="advisor">Advisor <span>Mohammed Sherin</span></p>
                 <ul class="d-flex justify-content-between">
                     <li class="price"><span class="red-strike">Rs.:1499</span> <span class="new-price">Rs.:599</span></li>
-                    <button id="buyNowBtn" type="button" class="btn btn-primary">Buy Now</button>
+                    <button id="buyNowBtn" type="button" class="btn btn-primary" data-id="PDE_and_Complex_Analysis" data-price="599">Buy Now</button>
                     <script>
-                        document.getElementById('buyNowBtn').addEventListener('click', () => {
-                            window.location.href = 'payment.html';
+                        const buyButtons = document.querySelectorAll('.buyNowBtn');
+
+                        buyButtons.forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const courseId = button.getAttribute('data-id');
+                            const coursePrice = button.getAttribute('data-price');
+
+                            // Save selected course info
+                            localStorage.setItem('selectedCourseId', courseId);
+                            localStorage.setItem('selectedCoursePrice', coursePrice);
+
+                            // Redirect to payment page
+                            window.location.href = '/payment.html';
+                        });
                         });
                     </script>
                 </ul>
