@@ -113,15 +113,27 @@
 								<a href="#" class="img" style="background-image: url(images/pde.jpg);">
 									<span class="price">Supplementary Course</span>
 								</a>
-								<div class="text p-4">
+								<div class="text p-4" data-id="PDE_and_Complex_Analysis" data-price="599">
 									<h3><a href="#">Partial Differential Equations and Complex Analysis</a></h3>
 									<p class="advisor">Advisor <span>Mohammed Sherin</span></p>
 									<ul class="d-flex justify-content-between">
 										<li class="price"><span class="red-strike">Rs.:1499</span> <span class="new-price">Rs.:599</span></li>
-										<button id="buyNowBtn" type="button" class="btn btn-primary">Buy Now</button>
+										<button id="buyNowBtn" type="button" class="btn btn-primary buyNowBtn" data-id="PDE_and_Complex_Analysis" data-price="599">Buy Now</button>
 										<script>
-											document.getElementById('buyNowBtn').addEventListener('click', () => {
-												window.location.href = 'payment.html';
+											const buyButtons = document.querySelectorAll('.buyNowBtn');
+
+											buyButtons.forEach(button => {
+											button.addEventListener('click', (e) => {
+												const courseId = button.getAttribute('data-id');
+												const coursePrice = button.getAttribute('data-price');
+
+												// Save selected course info
+												localStorage.setItem('selectedCourseId', courseId);
+												localStorage.setItem('selectedCoursePrice', coursePrice);
+
+												// Redirect to payment page
+												window.location.href = '/payment.html';
+											});
 											});
 										</script>
 									</ul>

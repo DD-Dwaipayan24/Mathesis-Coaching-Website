@@ -16,22 +16,7 @@ async function seedCourses() {
         title: 'PDE and Complex Analysis',
         folderId: '11928597', // replace with real Vimeo folder ID
         description: 'Complete course on PDE and Complex Analysis.',
-      },
-      {
-        courseId: 'Linear Algebra',
-        title: 'Linear Algebra',
-        folderId: '123456789',
-      },
-      {
-        courseId: 'Real Analysis',
-        title: 'Real Analysis',
-        folderId: '1122334455',
-      },
-      {
-        courseId: 'Vector Calculus',
-        title: 'Vector Calculus',
-        folderId: '9988776655',
-      },
+      }
     ]);
 
     console.log('🎉 Courses added successfully!');

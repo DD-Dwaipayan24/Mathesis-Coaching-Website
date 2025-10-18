@@ -15,6 +15,8 @@ const MongoStore = require('connect-mongo');
 const cors = require("cors");
 // const fetch = require('node-fetch');
 const Course = require('./js/Course');
+const paymentRoutes = require('./routes/payment');
+
 
 require("dotenv").config();
 
@@ -93,7 +95,8 @@ app.use(session({
   //     maxAge: 1000 * 60 * 60 * 24, // 1 day
   //   },
 }));
-
+app.use("/api", paymentRoutes);
+app.use("/api", Course);
 // -----------Database Setup-----------
 
 // MongoDB connection
@@ -130,7 +133,8 @@ const userSchema = new mongoose.Schema({
 //   return bcrypt.compare(candidatePassword, this.password);
 // };
 
-const User = mongoose.model("User", userSchema);
+const User = require("./models/User");
+app.use("/api", User);
 
 //Video Schema
 const videoSchema = new mongoose.Schema({
@@ -239,7 +243,6 @@ app.post('/login', async (req, res) => {
 // Middleware to protect routes
 function requireLogin(req, res, next) {
   if (!req.session.user) {
-    console.log('Session data:', req.session);
     return res.redirect('/index.html');
   }
   next();
@@ -292,7 +295,7 @@ app.get('/my-courses', async (req, res) => {
     }
 
     const user = await User.findOne({ _id: userSession.id });
-    // console.log('👤 User purchased courses:', user.purchasedCourses);
+    console.log('👤 User purchased courses:', user.purchasedCourses[0]);
     if (!user) {
       console.log('❌ User not found');
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -304,17 +307,16 @@ app.get('/my-courses', async (req, res) => {
       return res.status(403).json({ success: false, message: 'Payment required' });
     }
 
+    console.log('🛒 Fetching courses for user:', Course);
     // 🎓 Fetch all courses from DB
     const allCourses = await Course.find();
-    //console.log('📚 All available courses:', allCourses);
-
-    // console.log('🧠 Current session data:', req.session.userSession);
-
+    console.log('📚 All available courses:', allCourses);
+    
     // 🎓 Return only purchased courses
     const purchasedCourses = allCourses.filter(course =>
       user.purchasedCourses[0]
     );
-    //console.log('✅ Purchased courses:', purchasedCourses);
+    console.log('✅ Purchased courses:', purchasedCourses);
 
     if (purchasedCourses.length === 0) {
       return res.json({ success: false, message: 'No purchased courses found' });
@@ -332,7 +334,6 @@ app.get('/my-courses', async (req, res) => {
 app.get('/vimeo-videos/:folderId', async (req, res) => {
   try {
     const folderId = req.params.folderId; // e.g., folder for "Linear Algebra"
-    console.log('🎬 Fetching videos for folder ID:', folderId);
     // Fetch videos from that Vimeo folder
     const vimeoRes = await fetch(`https://api.vimeo.com/albums/11928597/videos`, {
       headers: {
@@ -352,7 +353,6 @@ app.get('/vimeo-videos/:folderId', async (req, res) => {
       title: v.name,
       embedUrl: `https://player.vimeo.com/video/${v.uri.split('/').pop()}?fl=pl&fe=sh`
     }));
-    console.log('🎬 Processed video list:', videos.length);
     res.json({ success: true, videos });
   } catch (err) {
     console.error('Error fetching Vimeo videos:', err);
@@ -423,70 +423,63 @@ app.get("/dashboard", requireLogin, async (req, res) => {
 // });
 
 //Payment Route
-app.post('/create-order', async (req, res) => {
-    const { orderId, orderAmount, customerName, customerEmail, customerPhone } = req.body;
+// app.post('/create-order', async (req, res) => {
+//     const { orderId, orderAmount, customerName, customerEmail, customerPhone } = req.body;
 
-    const cleanName = customerName.replace(/\s+/g, '').toLowerCase(); // remove spaces
-    const first4 = cleanName.substring(0, 4);
-    const last4 = customerPhone.slice(-4);
-    const customerId = `${first4}${last4}`;
+//     const cleanName = customerName.replace(/\s+/g, '').toLowerCase(); // remove spaces
+//     const first4 = cleanName.substring(0, 4);
+//     const last4 = customerPhone.slice(-4);
+//     const customerId = `${first4}${last4}`;
 
-    const data = {
-        order_id: orderId,
-        order_amount: orderAmount.toString(),
-        order_currency: "INR",
-        customer_details: {
-            customer_id: customerId, // using generated ID
-            customer_name: customerName,
-            customer_email: customerEmail,
-            customer_phone: customerPhone
-        },
-        order_meta: {
-            return_url: "http://localhost:3000/payment-success",
-            order_expiry_minutes: 60
-        }
-    };
+//     const data = {
+//         order_id: orderId,
+//         order_amount: orderAmount.toString(),
+//         order_currency: "INR",
+//         customer_details: {
+//             customer_id: customerId, // using generated ID
+//             customer_name: customerName,
+//             customer_email: customerEmail,
+//             customer_phone: customerPhone
+//         },
+//         order_meta: {
+//             return_url: "http://localhost:3000/payment-success",
+//             order_expiry_minutes: 60
+//         }
+//     };
 
-    const url = process.env.CASHFREE_SANDBOX === 'true' 
-        ? 'https://sandbox.cashfree.com/pg/orders' 
-        : 'https://api.cashfree.com/pg/orders';
+//     const url = process.env.CASHFREE_SANDBOX === 'true' 
+//         ? 'https://sandbox.cashfree.com/pg/orders' 
+//         : 'https://api.cashfree.com/pg/orders';
 
-    try {
-        console.log('Creating Cashfree order with data:', data);
-        const response = await axios.post(url, data, {
-            headers: {
-                'Content-Type': 'application/json',
-                'x-client-id': process.env.CASHFREE_APP_ID,
-                'x-client-secret': process.env.CASHFREE_SECRET_KEY,
-                'x-api-version': '2022-09-01'
-            }
-        });
+//     // console.log('Cashfree API URL:', url);
+//     try {
+//         console.log('Creating Cashfree order with data:', data);
+//         const response = await axios.post(url, data, {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'x-client-id': process.env.CASHFREE_APP_ID,
+//                 'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+//                 'x-api-version': '2022-09-01'
+//             }
+//         });
 
-        // const paymentLink = `https://sandbox.cashfree.com/pg/orders/${response.data.cf_order_id}`;
-        // console.log('Payment link:', paymentLink);
-        //console.log('✅ Cashfree order created:', response.data);
-        res.json(response.data); // ✅ returns order token & payment link
-    } catch (err) {
-        console.error('Error calling Cashfree API:', err.message);
+//         const paymentLink = `https://sandbox.cashfree.com/pg/orders/${response.data.cf_order_id}`;
+//         // console.log('✅ Cashfree order created:', response.data);
+//         res.json(response.data); // ✅ returns order token & payment link
+//     } catch (err) {
+//         console.error('Error calling Cashfree API:', err.message);
 
-        // Check if err.response exists
-        if (err.response) {
-            console.error('Cashfree response data:', err.response.data);
-            res.status(err.response.status).json(err.response.data);
-        } else {
-            res.status(500).json({ message: 'Unable to connect to Cashfree API' });
-        }
-    }
-});
+//         // Check if err.response exists
+//         if (err.response) {
+//             console.error('Cashfree response data:', err.response.data);
+//             res.status(err.response.status).json(err.response.data);
+//         } else {
+//             res.status(500).json({ message: 'Unable to connect to Cashfree API' });
+//         }
+//     }
+// });
 
-// ---------- SUCCESS & FAILURE ROUTES ----------
-app.get('/payment-success', (req, res) => {
-  res.send('<h1>Payment Successful ✅</h1>');
-});
 
-app.get('/payment-failed', (req, res) => {
-  res.send('<h1>Payment Failed ❌</h1>');
-});
 
 
 //Contact Form Route
@@ -567,7 +560,7 @@ app.post("/reset-password/:token", async (req, res) => {
   }
 });
 
-
+app.use("/", paymentRoutes);
 
 
 // Start server
