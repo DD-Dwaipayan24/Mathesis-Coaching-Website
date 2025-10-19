@@ -97,13 +97,13 @@ window.addEventListener("load", function () {
       });
 
       const data = await res.json();
-      console.log('Server Response:', data);
+      // console.log('Server Response:', JSON.stringify(response));
 
        const options = {
         key: data.key,
         amount: data.amount * 100,
         currency: data.currency,
-        name: "Coaching Institute",
+        name: "Mathesis Coaching Institute",
         description: "Course Payment",
         order_id: data.orderId,
         handler: async function (response) {

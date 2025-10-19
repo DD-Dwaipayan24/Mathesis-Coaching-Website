@@ -12,7 +12,7 @@ async function sendPurchaseMail(to, courseName, amount, orderId) {
   const dashboardLink = "https://www.mathesis-coaching.com/dashboard"; // 🔗 Change to your real dashboard URL
 
   const mailOptions = {
-    from: `"Coaching Institute" <${process.env.EMAIL_USER}>`,
+    from: `"Mathesis Coaching Institute" <${process.env.EMAIL_USER}>`,
     to,
     subject: "🎉 Successful Course Purchase Confirmation",
     html: `
@@ -36,7 +36,7 @@ async function sendPurchaseMail(to, courseName, amount, orderId) {
         </a>
 
         <p style="margin-top: 30px;">For any queries, feel free to contact our support team.</p>
-        <p>Best regards,<br><b>Coaching Institute Team</b></p>
+        <p>Best regards,<br><b>Mathesis Coaching Institute Team</b></p>
         <hr style="margin-top: 20px;">
         <small style="color: #888;">This is a system generated mail. Please do not reply directly.</small>
       </div>

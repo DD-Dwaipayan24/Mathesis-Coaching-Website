@@ -108,6 +108,7 @@ router.post("/verify-payment", async (req, res) => {
       return res.status(400).json({ message: "Missing payment details" });
     }
 
+
     // Signature verification
     const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
@@ -142,8 +143,9 @@ router.post("/verify-payment", async (req, res) => {
         if (!updatedUser) {
         console.warn("User not found for email:", customerEmail);
         }
+        console.log("Updated user after payment:", updatedPayment);
 
-        await sendPurchaseMail(customerEmail, courseName, amount, orderId);
+        await sendPurchaseMail(customerEmail, courseId, updatedPayment.amount, updatedPayment.orderId);
 
       return res.json({ success: true, message: "Payment verified and updated" });
     } else {
