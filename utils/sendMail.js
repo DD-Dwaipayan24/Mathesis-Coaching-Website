@@ -1,22 +1,17 @@
-const nodemailer = require("nodemailer");
+require("dotenv").config();
+const sgMail = require("@sendgrid/mail");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER, // your Gmail ID
-    pass: process.env.EMAIL_PASS, // your Gmail App Password
-  },
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendPurchaseMail(to, courseName, amount, orderId) {
-  const dashboardLink = "https://www.mathesis-coaching.com/dashboard"; // 🔗 Change to your real dashboard URL
+  const dashboardLink = "https://www.mathesis-coaching.com/dashboard"; // change if needed
 
-  const mailOptions = {
-    from: `"Mathesis Coaching Institute" <${process.env.EMAIL_USER}>`,
+  const msg = {
     to,
+    from: {
+      name: "Mathesis Coaching Institute",
+      email: process.env.EMAIL_USER, // must be verified in SendGrid
+    },
     subject: "🎉 Successful Course Purchase Confirmation",
     html: `
       <div style="font-family: Arial, sans-serif; padding: 25px; border-radius: 12px; background: #f8f9fa; color: #333;">
@@ -41,12 +36,18 @@ async function sendPurchaseMail(to, courseName, amount, orderId) {
         <p style="margin-top: 30px;">For any queries, feel free to contact our support team.</p>
         <p>Best regards,<br><b>Mathesis Coaching Institute Team</b></p>
         <hr style="margin-top: 20px;">
-        <small style="color: #888;">This is a system generated mail. Please do not reply directly.</small>
+        <small style="color: #888;">This is a system-generated mail. Please do not reply directly.</small>
       </div>
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await sgMail.send(msg);
+    console.log("✅ Purchase confirmation email sent successfully to:", to);
+  } catch (error) {
+    console.error("❌ Email sending failed:", error);
+    if (error.response) console.error(error.response.body);
+  }
 }
 
 module.exports = sendPurchaseMail;
