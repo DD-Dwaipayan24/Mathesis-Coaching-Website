@@ -32,6 +32,8 @@ async function loadCourses() {
       return;
     }
 
+
+
     container.innerHTML = ''; // clear loading message
     
     // 2️⃣ Loop through purchased courses
@@ -61,6 +63,11 @@ async function loadCourses() {
           courseDiv.innerHTML += `<p>No videos available yet.</p>`;
           continue;
         }
+
+        // 🔹 ADD THIS SORTING BLOCK HERE
+        videos.videos.sort((a, b) => a.title.localeCompare(b.title));
+
+
 
         // 5️⃣ Render each video securely
         const videoGrid = document.createElement('div');

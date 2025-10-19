@@ -21,16 +21,43 @@
   <h2>Make a Payment</h2>
   <form id="paymentForm">
     <input type="text" id="name" placeholder="Full Name" required />
-    <input type="email" id="email" placeholder="Email" required />
+    <input type="email" id="email" placeholder="Registered Email" required />
     <input type="text" id="phone" placeholder="Phone Number" required />
     <input type="number" id="coursePrice" placeholder="Amount (INR)" disabled />
     <input type="text" id="courseId" placeholder="Course ID" disabled />
-    <button type="submit">Pay Now</button>
+    <button type="button" onclick="verifyUserAndProceed()">Pay Now</button>
   </form>
 </div>
 
 <!-- ✅ Your JS (runs after SDK is loaded) -->
 <script>
+
+    async function verifyUserAndProceed() {
+      const email = document.getElementById("email").value;
+
+      try {
+        const response = await fetch("/verify-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          // Not registered — redirect and show popup
+          alert("You are not registered. Redirecting to registration page...");
+          window.location.href = "/registration.html";
+        } else {
+          // Registered — proceed with payment
+          document.getElementById("paymentForm").dispatchEvent(new Event("submit"));
+        }
+
+      } catch (err) {
+        console.error("Verification failed", err);
+        alert("Server error. Please try again later.");
+      }
+    }
 window.addEventListener("load", function () {
   const courseId = localStorage.getItem('selectedCourseId');
   const coursePrice = localStorage.getItem('selectedCoursePrice');
@@ -54,6 +81,7 @@ window.addEventListener("load", function () {
     // disable button to prevent double submits
     const submitBtn = e.target.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
+
 
     try {
       const res = await fetch('/create-order', {

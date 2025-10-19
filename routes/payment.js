@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const Payment = require('../models/payment');
 const User = require("../models/User");
+const sendPurchaseMail = require("../utils/sendMail");
 const Razorpay = require("razorpay");
 const axios = require('axios');
 const crypto = require("crypto");
@@ -73,6 +74,32 @@ router.post('/create-order', async (req, res) => {
   }
 });
 
+router.post('/verify-user', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not registered",
+      });
+    }
+
+    // If user exists
+    res.status(200).json({
+      success: true,
+      message: "User verified",
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 router.post("/verify-payment", async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
@@ -115,6 +142,8 @@ router.post("/verify-payment", async (req, res) => {
         if (!updatedUser) {
         console.warn("User not found for email:", customerEmail);
         }
+
+        await sendPurchaseMail(customerEmail, courseName, amount, orderId);
 
       return res.json({ success: true, message: "Payment verified and updated" });
     } else {

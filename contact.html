@@ -34,8 +34,8 @@
 				<ul class="navbar-nav ml-auto">
 					<li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
 					<li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
-					<li class="nav-item"><a href="course.html" class="nav-link">Course</a></li>
-					<li class="nav-item"><a href="instructor.html" class="nav-link">Instructor</a></li>
+					<li class="nav-item"><a href="course.html" class="nav-link">Courses</a></li>
+					<li class="nav-item"><a href="instructor.html" class="nav-link">Instructors</a></li>
 					<li class="nav-item active"><a href="contact.html" class="nav-link">Contact</a></li>
 					<li class="nav-item"><a href="./login.html" class="nav-link">Login</a></li>
 				</ul>
@@ -87,8 +87,22 @@
 											</div>
 											<div class="col-md-12">
 												<div class="form-group">
-													<label class="label" for="#">Message</label>
+													<label class="label" for="message">Message</label>
 													<textarea name="message" class="form-control" id="message" cols="30" rows="4" placeholder="Message"></textarea>
+												</div>
+											</div>
+											<div class="col-md-12">
+												<div class="form-group">
+													<label class="label" for="expectedCourse">Which course would you like next?</label>
+													<!-- <textarea name="message" class="form-control" id="message" cols="30" rows="4" placeholder="Message"></textarea> -->
+													<select id="expectedCourse" class="form-control" name="expectedCourse" required>
+														<option value="">--Select a course--</option>
+														<option value="python">Vector Calculus, Differential Equations and Transforms</option>
+														<option value="webdev">Probability Statistics & Numerical Methods</option>
+														<option value="datascience">Discrete Mathematical Structures</option>
+														<option value="machinelearning">Probability Random Process & Numerical Methods</option>
+														<!-- <option value="other">Other</option> -->
+													</select>
 												</div>
 											</div>
 											<div class="col-md-12">
@@ -163,62 +177,62 @@
 
 
 	<footer class="ftco-footer ftco-no-pt">
-		<div class="container">
-			<div class="row mb-5">
-			<div class="col-md pt-5">
-				<div class="ftco-footer-widget pt-md-5 mb-4">
-				<h2 class="ftco-heading-2">About</h2> 
-				<p>Whether you are preparing for your regular or supplementary exams, we are here to help you succeed. Join us and experience a structured learning journey.</p>
-				<ul class="ftco-footer-social list-unstyled float-md-left float-lft">
-					<li class="ftco-animate"><a href="#"><span class="fa fa-twitter"></span></a></li>
-					<li class="ftco-animate"><a href="#"><span class="fa fa-facebook"></span></a></li>
-					<li class="ftco-animate"><a href="#"><span class="fa fa-instagram"></span></a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="col-md pt-5">
-			<div class="ftco-footer-widget pt-md-5 mb-4 ml-md-5">
-			<h2 class="ftco-heading-2">Help Desk</h2>
-			<ul class="list-unstyled">
-				<li><a href="contact.html" class="py-2 d-block">Customer Care</a></li>
-				<li><a href="privacy-policy.html" class="py-2 d-block">Privacy and Policy</a></li>
-				<!-- <li><a href="#" class="py-2 d-block">Refund Policy</a></li> -->
-				<li><a href="tel:+918617650073" class="py-2 d-block">Call Us</a></li>
-			</ul>
-		</div>
-		</div>
-		<div class="col-md pt-5">
-		<div class="ftco-footer-widget pt-md-5 mb-4">
-			<h2 class="ftco-heading-2">Recent Courses</h2>
-			<ul class="list-unstyled">
-				<li><a href="#" class="py-2 d-block">Supplementary Course</a></li>
-				<li><a href="#" class="py-2 d-block">Regular Course</a></li>
-			</ul>
-		</div>
-		</div>
-		<div class="col-md pt-5">
-			<div class="ftco-footer-widget pt-md-5 mb-4">
-			<h2 class="ftco-heading-2">Have a Questions?</h2>
-			<div class="block-23 mb-3">
-				<ul>
-				<!-- <li><span class="icon fa fa-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li> -->
-				<li><a href="#"><span class="icon fa fa-phone"></span><span class="text">+91 8617650073</span></a></li>
-				<li><a href="#"><span class="icon fa fa-paper-plane"></span><span class="text">mathesis.coaching@gmail.com</span></a></li>
-			</ul>
-		</div>
-		</div>
-		</div>
-		</div>
-		<div class="row">
-		<div class="col-md-12 text-center">
+  <div class="container">
+    <div class="row mb-5">
+      <div class="col-md pt-5">
+        <div class="ftco-footer-widget pt-md-5 mb-4">
+          <h2 class="ftco-heading-2">About</h2>
+          <p>Whether you are preparing for your semester exams, we are here to help you succeed. Join us and experience a structured learning journey.</p>
+          <ul class="ftco-footer-social list-unstyled float-md-left float-lft">
+            <li class="ftco-animate"><a href="https://www.facebook.com/profile.php?id=61582155671803"><span class="fa fa-facebook"></span></a></li>
+            <li class="ftco-animate"><a href="https://www.instagram.com/mathesiscoaching?igsh=ZnVlZzVhMGZqOXBp"><span class="fa fa-instagram"></span></a></li>
+        </ul>
+    </div>
+</div>
+<div class="col-md pt-5">
+    <div class="ftco-footer-widget pt-md-5 mb-4 ml-md-5">
+      <h2 class="ftco-heading-2">Help Desk</h2>
+      <ul class="list-unstyled">
+        <li><a href="contact.html" class="py-2 d-block">Customer Care</a></li>
+        <li><a href="privacy-policy.html" class="py-2 d-block">Privacy and Policy</a></li>
+        <!-- <li><a href="#" class="py-2 d-block">Refund Policy</a></li> -->
+        <li><a href="tel:+918617650073" class="py-2 d-block">Call Us</a></li>
+    </ul>
+</div>
+</div>
+<div class="col-md pt-5">
+   <div class="ftco-footer-widget pt-md-5 mb-4">
+      <h2 class="ftco-heading-2">Recent Courses</h2>
+      <ul class="list-unstyled">
+        <li><a href="course.html" class="py-2 d-block">Crash Courses</a></li>
+          <!-- <li><a href="course-2.html" class="py-2 d-block">Regular Courses</a></li> -->
+        </ul>
+    </div>
+</div>
+<div class="col-md pt-5">
+    <div class="ftco-footer-widget pt-md-5 mb-4">
+       <h2 class="ftco-heading-2">Have a Questions?</h2>
+       <div class="block-23 mb-3">
+         <ul>
+           <!-- <li><span class="icon fa fa-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li> -->
+           <li><a href="tel:+918617650073"><span class="icon fa fa-phone"></span><span class="text">+91 8617650073</span></a></li>
+           <li><a href="mailto:mathesis.coaching@gmail.com"><span class="icon fa fa-paper-plane"></span><span class="text"> mathesis.coaching@gmail.com</span></a></li>
+       </ul>
+   </div>
+</div>
+</div>
+</div>
+<div class="row">
+  <div class="col-md-12 text-center">
 
-			<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-			Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
-			<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
-		</div>
-		</div>
-		</div>
-	</footer>
+    <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+      Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved 
+      <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+  </div>
+</div>
+</div>
+</footer>
+
 
 		
 		
