@@ -145,7 +145,7 @@ router.post("/verify-payment", async (req, res) => {
         }
         console.log("Updated user after payment:", updatedPayment);
 
-        await sendPurchaseMail(customerEmail, courseId, updatedPayment.amount, updatedPayment.orderId);
+      sendPurchaseMail(customerEmail, courseId, updatedPayment.amount, updatedPayment.orderId);
 
       return res.json({ success: true, message: "Payment verified and updated" });
     } else {
