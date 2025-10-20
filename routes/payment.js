@@ -59,6 +59,7 @@ router.post('/create-order', async (req, res) => {
       paymentStatus: "PENDING",
     });
 
+
     await payment.save();
 
     res.json({
@@ -121,6 +122,7 @@ router.post("/verify-payment", async (req, res) => {
         { $set: { paymentStatus: "SUCCESS" } }, // update
         { new: true }                         // return updated doc
       );
+
 
       if (!updatedPayment) {
         console.error("No payment found with orderId:", razorpay_order_id);
