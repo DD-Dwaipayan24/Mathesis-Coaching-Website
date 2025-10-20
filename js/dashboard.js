@@ -42,30 +42,47 @@ async function loadCourses() {
       courseDiv.className = 'course-section';
       courseDiv.innerHTML = `<h2>${escapeHtml(course.title)}</h2>`;
       container.appendChild(courseDiv);
-      
+
       try {
         // 3️⃣ Check access for this course
         const accessRes = await fetch(`${API_URL}/check-access/${encodeURIComponent(course.courseId)}`, { credentials: 'include' });
         const accessData = await accessRes.json();
+
+        // console.log(`🔐 Access data for course:`, accessData);
         
         // accessData.hasPaid = true; // TEMPORARY BYPASS FOR TESTING
         if (!accessData.hasPaid) {
           courseDiv.innerHTML += `<p class="locked">🔒 Locked — Please complete payment.</p>`;
           continue;
         }
-
+        console.log(`✅ Access granted for course ${course.folderId}`);
         // 4️⃣ Fetch Vimeo videos for this course (folder)
         const videoRes = await fetch(`${API_URL}/vimeo-videos/${encodeURIComponent(course.folderId)}`, { credentials: 'include' });
+        // console.log(`🌐 Fetching videos from: ${API_URL}/vimeo-videos/${encodeURIComponent(course.folderId)}`);
+    
         if (!videoRes.ok) throw new Error('Failed to load videos');
         const videos = await videoRes.json();
+        // console.log(`🎞️ Videos fetched for course ${course.id}:`, videos);
+
+        let videoList = Array.isArray(videos.videos) ? videos.videos : videos;
+
+        
+
+        // videoList = videoList.filter(v => v.folderId === course.folderId || v.folder?.id === course.folderId);
+
+        // console.log('🎞️ Raw video list:', videoList);
+
+
+        // console.log(`🎥 Videos data for course ${course.id}:`, videos);
         
         if (!videos) {
           courseDiv.innerHTML += `<p>No videos available yet.</p>`;
           continue;
         }
 
+       
         // 🔹 ADD THIS SORTING BLOCK HERE
-        videos.videos.sort((a, b) => a.title.localeCompare(b.title));
+        videoList.sort((a, b) => a.title.localeCompare(b.title));
 
 
 
@@ -77,10 +94,11 @@ async function loadCourses() {
           continue;
         }
         videoGrid.className = 'video-grid';
-      
-        videos.videos.forEach(video => {
+
+        console.log(`🎬 Found ${videoList.length} videos for course ${course.id}`);
+        videoList.forEach(video => {
           const embedUrl = video.embedUrl;
-          console.log('▶️ Embedding video URL:', embedUrl);
+          // console.log('▶️ Embedding video URL:', embedUrl);
 
           const videoCard = document.createElement('div');
           videoCard.className = 'video-card';

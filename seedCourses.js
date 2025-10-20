@@ -16,6 +16,18 @@ async function seedCourses() {
         title: 'PDE and Complex Analysis',
         folderId: '11928597', // replace with real Vimeo folder ID
         description: 'Complete course on PDE and Complex Analysis.',
+      },
+      {
+        courseId: 'Vector Calculus Differential Equations and Transforms',
+        title: 'Vector Calculus, Differential Equations and Transforms',
+        folderId: '11936559', // replace with real Vimeo folder ID
+        description: 'Complete course on Vector Calculus, Differential Equations and Transforms.',
+      },
+      {
+        courseId: 'Discrete Mathematical Structures',
+        title: 'Discrete Mathematical Structures',
+        folderId: '11936570', // replace with real Vimeo folder ID
+        description: 'Complete course on Discrete Mathematical Structures.',
       }
     ]);
 

@@ -142,6 +142,7 @@ router.post("/verify-payment", async (req, res) => {
         { new: true }
         );
 
+
         if (!updatedUser) {
         console.warn("User not found for email:", customerEmail);
         }

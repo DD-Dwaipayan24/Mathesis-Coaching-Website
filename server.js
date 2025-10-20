@@ -268,6 +268,7 @@ app.get('/check-access/:courseId', async (req, res) => {
   //console.log('🧠 Current session data:', req.session.user);
 
   const user = await User.findOne({ email: userSession.email });
+  console.log('👤 User data:', user);
   if (!user) {
     console.log('❌ User not found');
     return res.status(403).json({ hasPaid: false, message: 'User not found' });
@@ -276,8 +277,9 @@ app.get('/check-access/:courseId', async (req, res) => {
   const courseId = decodeURIComponent(req.params.courseId); // e.g., "PDE" or "Complex Analysis"
   
    // Check if this course is in the purchasedCourses array
-  const hasPaid = user.hasPaid && user.purchasedCourses[0].includes(courseId);
-  
+  const hasPaid = user.hasPaid && user.purchasedCourses.includes(courseId);
+  // console.log('💰 User has paid:', hasPaid);
+
   return res.json({ hasPaid });
   } catch (err) {
     console.error(err);
@@ -310,13 +312,13 @@ app.get('/my-courses', async (req, res) => {
     console.log('🛒 Fetching courses for user:', Course);
     // 🎓 Fetch all courses from DB
     const allCourses = await Course.find();
-    console.log('📚 All available courses:', allCourses);
+    // console.log('📚 All available courses:', allCourses);
     
     // 🎓 Return only purchased courses
     const purchasedCourses = allCourses.filter(course =>
       user.purchasedCourses[0]
     );
-    console.log('✅ Purchased courses:', purchasedCourses);
+    // console.log('✅ Purchased courses:', purchasedCourses);
 
     if (purchasedCourses.length === 0) {
       return res.json({ success: false, message: 'No purchased courses found' });
@@ -335,7 +337,7 @@ app.get('/vimeo-videos/:folderId', async (req, res) => {
   try {
     const folderId = req.params.folderId; // e.g., folder for "Linear Algebra"
     // Fetch videos from that Vimeo folder
-    const vimeoRes = await fetch(`https://api.vimeo.com/albums/11928597/videos`, {
+    const vimeoRes = await fetch(`https://api.vimeo.com/albums/${folderId}/videos`, {
       headers: {
         Authorization: `Bearer ${process.env.VIMEO_ACCESS_TOKEN}`,
       },

@@ -101,8 +101,28 @@
 														<option value="webdev">MAT202 - Probability Statistics & Numerical Methods</option>
 														<option value="datascience">MAT203 - Discrete Mathematical Structures</option>
 														<option value="machinelearning">MAT204 - Probability Random Process & Numerical Methods</option>
+														<option value="other">Other</option>
 														<!-- <option value="other">Other</option> -->
 													</select>
+													<div id="otherCourseContainer" style="display:none; margin-top:10px;">
+														<label class="label" for="otherCourse">Please specify the course:</label>
+														<input type="text" id="otherCourse" name="otherCourse" class="form-control" placeholder="Enter course name">
+													</div>
+													<script>
+														const select = document.getElementById('expectedCourse');
+														const otherContainer = document.getElementById('otherCourseContainer');
+
+														select.addEventListener('change', function () {
+															if (this.value === 'other') {
+															otherContainer.style.display = 'block';
+															document.getElementById('otherCourse').required = true;
+															} else {
+															otherContainer.style.display = 'none';
+															document.getElementById('otherCourse').required = false;
+															document.getElementById('otherCourse').value = '';
+															}
+														});
+													</script>
 												</div>
 											</div>
 											<div class="col-md-12">
@@ -124,6 +144,9 @@
 									name: e.target.name.value,
 									email: e.target.email.value,
 									message: e.target.message.value,
+									subject: e.target.subject.value,
+									expectedCourse: e.target.expectedCourse.value,
+									otherCourse: e.target.otherCourse ? e.target.otherCourse.value : ''
 								};
 
 								const res = await fetch("/contact", {
@@ -146,7 +169,7 @@
 											<span class="fa fa-phone"></span>
 										</div>
 										<div class="text pl-3">
-											<p><span>Phone:</span> <a href="tel://+918617650073">+91- 8617650073</a></p>
+											<p><span>Phone:</span> <a href="tel://+918714136404">+91- 8714136404</a></p>
 										</div>
 									</div>
 									<div class="dbox w-100 d-flex align-items-center">
@@ -196,7 +219,7 @@
         <li><a href="contact.html" class="py-2 d-block">Customer Care</a></li>
         <li><a href="privacy-policy.html" class="py-2 d-block">Privacy and Policy</a></li>
         <!-- <li><a href="#" class="py-2 d-block">Refund Policy</a></li> -->
-        <li><a href="tel:+918617650073" class="py-2 d-block">Call Us</a></li>
+        <li><a href="tel:+918714136404" class="py-2 d-block">Call Us</a></li>
     </ul>
 </div>
 </div>
@@ -215,7 +238,7 @@
        <div class="block-23 mb-3">
          <ul>
            <!-- <li><span class="icon fa fa-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li> -->
-           <li><a href="tel:+918617650073"><span class="icon fa fa-phone"></span><span class="text">+91 8617650073</span></a></li>
+           <li><a href="tel:+918714136404"><span class="icon fa fa-phone"></span><span class="text">+91 8714136404</span></a></li>
            <li><a href="mailto:mathesis.coaching@gmail.com"><span class="icon fa fa-paper-plane"></span><span class="text"> mathesis.coaching@gmail.com</span></a></li>
        </ul>
    </div>
