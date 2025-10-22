@@ -22,12 +22,6 @@ async function seedCourses() {
         title: 'Vector Calculus, Differential Equations and Transforms',
         folderId: '11936559', // replace with real Vimeo folder ID
         description: 'Complete course on Vector Calculus, Differential Equations and Transforms.',
-      },
-      {
-        courseId: 'Discrete Mathematical Structures',
-        title: 'Discrete Mathematical Structures',
-        folderId: '11936570', // replace with real Vimeo folder ID
-        description: 'Complete course on Discrete Mathematical Structures.',
       }
     ]);
 
