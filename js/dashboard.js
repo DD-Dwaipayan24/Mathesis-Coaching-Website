@@ -1,12 +1,4 @@
-// List of courses with Vimeo IDs
-// const videos = [
-//   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 1', vimeoId: '1126890140' },
-//   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 2', vimeoId: '1126892339' },
-//   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 3', vimeoId: '1126894648' },
-//   { id: 'PDE and Complex Analysis', title: 'MAT 201 LECTURE 4', vimeoId: '1126899169' }
-// ];
-// const fetch = require('node-fetch');
-// console.log(window.location.hostname);
+
 // Load all courses and their videos
 async function loadCourses() {
   const container = document.getElementById('video-container');
@@ -66,14 +58,7 @@ async function loadCourses() {
 
         let videoList = Array.isArray(videos.videos) ? videos.videos : videos;
 
-        
-
-        // videoList = videoList.filter(v => v.folderId === course.folderId || v.folder?.id === course.folderId);
-
-        // console.log('🎞️ Raw video list:', videoList);
-
-
-        // console.log(`🎥 Videos data for course ${course.id}:`, videos);
+    
         
         if (!videos) {
           courseDiv.innerHTML += `<p>No videos available yet.</p>`;
