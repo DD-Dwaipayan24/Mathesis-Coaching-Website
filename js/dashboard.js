@@ -119,8 +119,41 @@ async function loadCourses() {
   }
 }
 
+async function loadMaterials() {
+  const container = document.getElementById("materials-container");
+  container.innerHTML = "<p>Loading materials...</p>";
+
+  try {
+    // Example API — you’ll replace with your backend endpoint
+    const res = await fetch("/api/materials", { credentials: "include" });
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      container.innerHTML = "<p>No materials available yet.</p>";
+      return;
+    }
+
+    container.innerHTML = data.map(material => `
+      <div class="material-card ${material.locked ? 'locked' : ''}">
+        <iframe src="${material.locked ? '' : material.pdfUrl}"></iframe>
+        <div class="material-info">
+          <h3>${material.courseName}</h3>
+        </div>
+      </div>
+    `).join("");
+  } catch (err) {
+    console.error("Failed to load materials:", err);
+    container.innerHTML = "<p>Unable to load course materials.</p>";
+  }
+}
+
+
+
 // Initialize dashboard
-document.addEventListener('DOMContentLoaded', loadCourses);
+document.addEventListener('DOMContentLoaded', () => {
+  loadCourses();
+  loadMaterials();
+});
 
 // Small helper to avoid inserting raw HTML from data (very simple)
 function escapeHtml(str) {
