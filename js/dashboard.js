@@ -139,7 +139,7 @@ async function loadCourses() {
                 <p>${fileName.replace(".pdf", "")}</p>
                 <button class="fullscreen-btn" title="View Fullscreen">⛶</button>
               </div>
-              <iframe src="https://docs.google.com/gview?url=${API_URL}/materials/${encodeURIComponent(course.title.trim())}/${encodeURIComponent(fileName)}" class="pdf-viewer" loading="lazy"></iframe>
+              <iframe src="${API_URL}/materials/${encodeURIComponent(course.title.trim())}/${encodeURIComponent(fileName)}" class="pdf-viewer" loading="lazy"></iframe>
               <p>${escapeHtml(fileName)}</p>
             `;
             grid.appendChild(card);
