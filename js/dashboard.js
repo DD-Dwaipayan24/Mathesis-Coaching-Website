@@ -107,6 +107,64 @@ async function loadCourses() {
 
         courseDiv.appendChild(videoGrid);
 
+        // fetch materials list
+         // ✅ 3️⃣ Declare and append materialsDiv BEFORE we use it
+        const materialsDiv = document.createElement('div');
+        materialsDiv.className = 'materials-section';
+        materialsDiv.innerHTML = `<h3>📚 Course Materials</h3><p>Loading materials...</p>`;
+        courseDiv.appendChild(materialsDiv);
+
+        const matRes = await fetch(`${API_URL}/materials/${encodeURIComponent(course.title.trim())}/materials.json`);
+        console.log(`🌐 Fetching materials from: ${API_URL}/materials/${encodeURIComponent(course.title.trim())}/materials.json`);
+        if (!matRes.ok) {
+          materialsDiv.innerHTML = `<h3>📚 Course Materials</h3><p class="locked">Unable to load materials.</p>`;
+          continue;
+        }
+        const matData = await matRes.json();
+        console.log(`📚 Materials data for course ${course.title.trim()}:`, matData);
+
+        if (!matData.files?.length) {
+          materialsDiv.innerHTML = `<h3>📚 Course Materials</h3><p>No materials available yet.</p>`;
+          console.log(`No materials available for course ${course.title.trim()}`);
+        } else {
+          const grid = document.createElement('div');
+          grid.className = 'material-grid';
+          console.log(matData)
+          matData.files.forEach(fileName => {
+            const card = document.createElement('div');
+            card.className = 'material-card';
+            // Use iframe for quick view-only - pointer-events disabled by CSS
+            card.innerHTML = `
+              <div class="pdf-header">
+                <p>${fileName.replace(".pdf", "")}</p>
+                <button class="fullscreen-btn" title="View Fullscreen">⛶</button>
+              </div>
+              <iframe src="https://docs.google.com/gview?url=${API_URL}/materials/${encodeURIComponent(course.title.trim())}/${encodeURIComponent(fileName)}" class="pdf-viewer" loading="lazy"></iframe>
+              <p>${escapeHtml(fileName)}</p>
+            `;
+            grid.appendChild(card);
+          });
+          // ✅ Attach fullscreen button event listeners AFTER cards are created
+setTimeout(() => {
+  document.querySelectorAll('.fullscreen-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const iframe = e.target.closest('.material-card').querySelector('.pdf-viewer');
+
+      if (!document.fullscreenElement) {
+        iframe.requestFullscreen().catch((err) => {
+          alert(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  });
+}, 200);
+
+          materialsDiv.innerHTML = `<h3>📚 Course Materials</h3>`;
+          materialsDiv.appendChild(grid);
+         }
+
       } catch (err) {
         console.error(`Error loading videos for ${course.id}:`, err);
         courseDiv.innerHTML += `<p class="error">⚠️ Failed to load course videos.</p>`;
@@ -118,6 +176,7 @@ async function loadCourses() {
     container.innerHTML = '<p>❌ Failed to load your dashboard. Please try again later.</p>';
   }
 }
+
 
 async function loadMaterials() {
   const container = document.getElementById("materials-container");

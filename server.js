@@ -16,6 +16,7 @@ const cors = require("cors");
 // const fetch = require('node-fetch');
 const Course = require('./js/Course');
 const paymentRoutes = require('./routes/payment');
+const materialsRoute = require('./routes/materials');
 
 
 require("dotenv").config();
@@ -76,6 +77,19 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "admin-dashboard.html"));
   res.sendFile(path.join(__dirname, "privacy-policy.html"));
 });
+// simple JWT middleware example (server.js)
+
+app.use((req, res, next) => {
+  const token = req.cookies?.token || (req.headers.authorization ? req.headers.authorization.split(' ')[1] : null);
+  if (!token) return next();
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    // load minimal user into req.user (or load full user from DB in route)
+    req.user = { email: payload.email, id: payload.id };
+  } catch (e) { /* ignore invalid token */ }
+  next();
+});
+
 
 
 
@@ -97,6 +111,7 @@ app.use(session({
 }));
 app.use("/api", paymentRoutes);
 app.use("/api", Course);
+app.use("/api", materialsRoute);
 // -----------Database Setup-----------
 
 // MongoDB connection

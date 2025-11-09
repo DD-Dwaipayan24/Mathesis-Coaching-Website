@@ -146,6 +146,38 @@ main {
   opacity: 1;
 }
 
+/* Materials styles */
+.materials-section { margin-top:18px; background:#f8fafc; padding:14px; border-radius:10px; }
+.materials-section h3 { margin:0 0 10px; color:#1e3a8a; }
+.material-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(360px,1fr)); gap:16px; }
+.material-card { background:#fff; padding:10px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; overflow:hidden; }
+.pdf-viewer { width:100%; height:360px; border:none; pointer-events:none; user-select:none; }
+.material-card p { margin:10px 0 0; font-weight:600; color:#0f172a; }
+.locked { color:#ef4444; font-weight:600; margin-top:8px; }
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f1f1;
+  padding: 8px 12px;
+  border-radius: 10px 10px 0 0;
+}
+
+.fullscreen-btn {
+  border: none;
+  background: #4b8ef1;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+  padding: 4px 10px;
+}
+
+.fullscreen-btn:hover {
+  background: #367ae8;
+}
+
 /* 📱 Responsive Adjustments */
 @media (max-width: 768px) {
   #video-container {
